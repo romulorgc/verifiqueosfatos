@@ -102,7 +102,8 @@
 
     function getLS() {
       try {
-        return JSON.parse(localStorage.getItem('data')) || [];
+        const data = JSON.parse(localStorage.getItem('data'));
+        return Array.isArray(data) ? data : [];
       } catch {
         return [];
       }
@@ -228,13 +229,17 @@
           if (!Array.isArray(data)) return;
 
           if (!data.length) {
-            window.localStorage.removeItem('data');
+            try {
+              window.localStorage.removeItem('data');
+            } catch {}
             render([]);
           }
 
           if (data && data.length) {
             // Save to localStorage and update DOM incrementally
-            localStorage.setItem('data', JSON.stringify(data));
+            try {
+              localStorage.setItem('data', JSON.stringify(data));
+            } catch {}
             render(data);
           }
         })
