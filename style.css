@@ -131,6 +131,10 @@ main.loading:empty::after {
   margin: 0;
 }
 
+.foot a {
+  color: inherit;
+}
+
 /* Como classificamos: o critério de cada selo, sem JS */
 .how {
   max-width: 560px;

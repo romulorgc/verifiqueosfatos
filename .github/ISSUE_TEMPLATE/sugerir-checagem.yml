@@ -1,0 +1,33 @@
+name: Sugerir uma fala para checar
+description: Ouviu uma fala com um dado que dá para conferir? Mande aqui.
+title: "Checar: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Só dá para checar o que pode ser conferido com dados públicos. Opinião, promessa e previsão ficam de fora.
+  - type: input
+    id: quem
+    attributes:
+      label: Quem disse
+    validations:
+      required: true
+  - type: textarea
+    id: fala
+    attributes:
+      label: A fala
+      description: O mais literal possível.
+    validations:
+      required: true
+  - type: input
+    id: quando
+    attributes:
+      label: Onde e quando
+      placeholder: Debate da Globo, 2º bloco, por volta das 21h40
+    validations:
+      required: true
+  - type: textarea
+    id: fontes
+    attributes:
+      label: Onde conferir (opcional)
+      description: Se você já sabe onde está o dado, ajuda muito.

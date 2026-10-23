@@ -1,0 +1,42 @@
+name: Pedir correção
+description: Achou um erro numa checagem publicada? Mostre onde está e qual fonte comprova.
+title: "Correção: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por ajudar a deixar as checagens mais corretas. Correção entra com fonte verificável: discordar do candidato ou da classificação sem um dado que mostre o erro não é motivo de correção.
+  - type: input
+    id: link
+    attributes:
+      label: Link da checagem
+      description: O botão Compartilhar do card copia o link.
+      placeholder: https://verifiqueosfatos.com/#f3
+    validations:
+      required: true
+  - type: dropdown
+    id: tipo
+    attributes:
+      label: O que está errado
+      options:
+        - A fala foi transcrita errado
+        - A classificação não bate com os dados
+        - A fonte não diz o que a verificação afirma
+        - Falta um contexto que muda a conclusão
+        - Outro
+    validations:
+      required: true
+  - type: textarea
+    id: explicacao
+    attributes:
+      label: Explique o erro
+      description: O que a checagem diz e o que os dados mostram.
+    validations:
+      required: true
+  - type: textarea
+    id: fontes
+    attributes:
+      label: Fonte que comprova
+      description: Link para o dado oficial, documento ou vídeo (com o minuto). Sem fonte não dá para analisar o pedido.
+    validations:
+      required: true
