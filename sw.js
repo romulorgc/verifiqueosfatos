@@ -1,9 +1,10 @@
-const CACHE_NAME = 'pwa-static-v19'; // Bump on every asset change so clients update
+const CACHE_NAME = 'pwa-static-v20'; // Bump on every asset change so clients update
 const ASSETS_TO_CACHE = [
   './',
   './normalize.css',
   './style.css',
   './manifest.json',
+  './icon.png',
   './lula.webp',
   './flavio.webp',
   './favicon.ico',
@@ -41,12 +42,25 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// 3. Fetch Event: Cache-First for the app shell, everything else goes straight to the network
+// 3. Fetch Event: Network-first for sharing, cache-first for the app shell
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
   // posts.json is never cached: not calling respondWith lets the browser handle it untouched
   if (event.request.method !== 'GET' || url.pathname.endsWith('/posts.json')) return;
+
+  if (url.origin === self.location.origin && ['/share.js', '/share.css'].includes(url.pathname)) {
+    event.respondWith(
+      caches.open(CACHE_NAME).then(cache =>
+        fetch(event.request, { cache: 'no-cache' }).then(async response => {
+          if (!response.ok) throw response.status;
+          await cache.put(event.request, response.clone());
+          return response;
+        }).catch(() => cache.match(event.request))
+      )
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request, { ignoreSearch: true })

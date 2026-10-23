@@ -116,7 +116,10 @@
           load('link', { rel: 'stylesheet', href: '/share.css' }),
           load('script', { src: '/share.js' }),
         ]);
-        loading.then(() => self.openShare && self.openShare(button), () => loading = null);
+        loading.then(() => self.openShare && self.openShare(button), () => {
+          loading = null;
+          alert('Não foi possível abrir o compartilhamento. Conecte-se à internet e tente novamente.');
+        });
       });
     })();
   </script>
