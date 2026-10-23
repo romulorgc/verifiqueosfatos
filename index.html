@@ -237,6 +237,10 @@
       try { items = JSON.parse(raw); } catch { return false; }
       if (!Array.isArray(items)) return false;
 
+      const active = document.activeElement;
+      const focused = main.contains(active) ? active.closest('.card') : null;
+      const focusIndex = focused ? [...focused.querySelectorAll('a, button')].indexOf(active) : -1;
+
       // Nothing on screen yet (first visit boots with an empty list): don't animate everything
       const first = nodes.size === 0;
       const next = new Map();
@@ -275,6 +279,17 @@
         const n = ref.nextSibling;
         ref.remove();
         ref = n;
+      }
+
+      // Moving an existing node can also drop focus
+      if (focused && document.activeElement !== active) {
+        const card = focused.isConnected ? focused : list.find(el => el.id === focused.id) || list[0];
+        const target = focused.isConnected ? active : card?.querySelectorAll('a, button')[focusIndex] || card?.querySelector('a, button');
+        // Resolve new cards above the target before focus makes it a scroll anchor
+        for (let el = card?.previousElementSibling; el; el = el.previousElementSibling) {
+          if (el.classList.contains('new')) el.lastElementChild?.getBoundingClientRect();
+        }
+        target?.focus({ preventScroll: true });
       }
 
       nodes = next;
