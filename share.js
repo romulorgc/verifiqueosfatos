@@ -28,6 +28,10 @@
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3m-4 4 4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>
               <span>Compartilhar link</span>
             </button>
+            <button type="button" class="sh-btn" data-act="whatsapp">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 21l2.1-5.4A8.5 8.5 0 1 1 21 11.5Z"/><path d="M9 8c0 4 3 7 7 7l1-2-3-1-1 1-2-2 1-1-1-3-2 1Z"/></svg>
+              Enviar no WhatsApp
+            </button>
             <button type="button" class="sh-btn" data-act="copy" hidden>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>
               <span>Copiar imagem</span>
@@ -236,11 +240,12 @@
   }
 
   // Shares the link to the card; without the Web Share API, copies it instead
-  async function share() {
+  async function share(whatsapp) {
     const name = card.querySelector('h2').textContent;
     const title = `Veja se ${name} falou a verdade`;
-    const text = `${name} disse que: "${card.querySelector('.said').textContent.trim()}"\n\nSerá que é verdade? Veja a checagem:`;
+    const text = `${name} disse que: "${card.querySelector('.said').textContent.trim()}"\n\nChecagem: ${card.querySelector('.badge').textContent}. Veja por quê:`;
     const url = `${location.origin}/#${card.id}`;
+    if (whatsapp) return window.open('https://wa.me/?text=' + encodeURIComponent(`${text}\n${url}`), '_blank', 'noopener');
     if (navigator.share) return navigator.share({ title, text, url }).catch(() => {});
     try {
       await navigator.clipboard.writeText(`${text}\n${url}`);
@@ -296,6 +301,7 @@
     else if (b.dataset.dark) setLook(b.dataset.dark === '1');
     else if (b.dataset.act === 'share-image') shareImage();
     else if (b.dataset.act === 'share') share();
+    else if (b.dataset.act === 'whatsapp') share(true);
     else if (b.dataset.act === 'copy') copy();
   });
 
