@@ -81,10 +81,15 @@
   function wrap(text, width, max) {
     const lines = [];
     let line = '';
-    for (let word of text.trim().split(/\s+/)) {
+    // Only the visible excerpt needs measuring
+    for (let word of text.trim().slice(0, 1000).split(/\s+/)) {
       while (ctx.measureText(word).width > width) {
-        let i = word.length;
-        while (i > 1 && ctx.measureText(word.slice(0, i)).width > width) i--;
+        let i = 1, end = word.length;
+        while (i < end) {
+          const mid = Math.ceil((i + end) / 2);
+          if (ctx.measureText(word.slice(0, mid)).width <= width) i = mid;
+          else end = mid - 1;
+        }
         if (line) lines.push(line);
         lines.push(word.slice(0, i));
         line = '';
