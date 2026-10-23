@@ -226,7 +226,7 @@
     }
 
     function canRender(item) {
-      return !!(item && labels.n[item.n] && labels.c[item.c] && item.t != null && item.t !== '');
+      return !!(item && Number.isInteger(item.n) && Object.prototype.hasOwnProperty.call(labels.n, item.n) && Number.isInteger(item.c) && Object.prototype.hasOwnProperty.call(labels.c, item.c) && item.t != null && item.t !== '');
     }
 
     // Renders posts newest-first. Returns false if raw is not a valid posts array.
