@@ -17,6 +17,12 @@ cache_name() {
 }
 
 head_list=$(cached_files < sw.js)
+while IFS= read -r file; do
+  if [ ! -f "$file" ]; then
+    echo "::error file=sw.js::Arquivo da lista ASSETS_TO_CACHE não existe no repositório: $file"
+    exit 1
+  fi
+done <<< "$head_list"
 base_list=$(git show "$BASE:sw.js" | cached_files)
 # Compare the merge-base with the working tree, so uncommitted edits are also checked locally
 # (in CI the working tree equals HEAD). Untracked files are included too.

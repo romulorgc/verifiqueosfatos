@@ -19,7 +19,7 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('[Service Worker] Caching app shell');
-        return cache.addAll(ASSETS_TO_CACHE);
+        return Promise.allSettled(ASSETS_TO_CACHE.map((asset) => cache.add(asset)));
       })
       .then(() => self.skipWaiting())
   );
