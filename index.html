@@ -376,8 +376,24 @@
 
   <script>
     if ('serviceWorker' in navigator) {
+      let controlled = !!navigator.serviceWorker.controller;
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        // Skip the first install, but reload on later updates
+        if (controlled && !refreshing) {
+          refreshing = true;
+          window.location.reload();
+        }
+        controlled = true;
+      });
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js');
+        navigator.serviceWorker.register('./sw.js').then((reg) => {
+          const check = () => {
+            if (reg && document.visibilityState === 'visible') reg.update().catch(() => {});
+          };
+          setInterval(check, 300000);
+          document.addEventListener('visibilitychange', check);
+        }).catch(() => {});
       });
     }
   </script>
