@@ -66,6 +66,7 @@
       <div class="thermo-scale" aria-hidden="true"><span>Falso</span><span>Parcial</span><span>Verdadeiro</span></div>
     </section>
 
+    <p class="status" role="status"></p>
     <main class="article-grid loading"></main>
 
     <footer class="foot">
@@ -150,6 +151,8 @@
     let lastRaw = null;
     let unseen = 0;
     let currentPosts = [];
+    let lastUpdate = '';
+    const statusLine = document.querySelector('.status');
 
     function createFixHTML(fix) {
       return typeof fix === 'string' && fix.trim() ? `<span class="label">Correção:</span><p class="fix">${escapeHTML(fix)}</p>` : '';
@@ -317,14 +320,28 @@
           return r.text();
         })
         .then(raw => {
-          // First answer from the server: from now on an empty list really means "nothing yet"
-          main.classList.remove('loading');
-
-          if (raw !== lastRaw && render(raw)) {
+          if (raw !== lastRaw) {
+            if (!render(raw)) throw new Error('Invalid data');
             try { localStorage.setItem('data', raw); } catch {}
           }
+
+          // First answer from the server: from now on an empty list really means "nothing yet"
+          main.classList.remove('loading');
+          lastUpdate = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+          if (statusLine.textContent) statusLine.textContent = '';
         })
-        .catch(console.error)
+        .catch(error => {
+          console.error(error);
+          main.classList.remove('loading');
+          // Only change the text on transitions so screen readers don't repeat it every poll
+          if (!statusLine.textContent) {
+            statusLine.textContent = lastUpdate
+              ? `Não conseguimos atualizar desde as ${lastUpdate}. Tentando de novo…`
+              : currentPosts.length
+                ? 'Não conseguimos atualizar. Mostrando as últimas checagens salvas. Tentando de novo…'
+                : 'Não conseguimos carregar as checagens. Tentando de novo…';
+          }
+        })
         .finally(() => {
           busy = false;
           // Jitter spreads clients so they don't hit the host in sync

@@ -107,6 +107,20 @@ h1 {
   color: var(--muted);
 }
 
+.status {
+  margin: 0 0 20px;
+  color: var(--ink2);
+  font-size: 14px;
+}
+
+.status:empty {
+  margin: 0;
+}
+
+.status:not(:empty) + main:empty::after {
+  content: none;
+}
+
 main:empty::after {
   content: 'Nada por aqui ainda... verifique novamente daqui alguns minutos.';
   color: var(--muted);
