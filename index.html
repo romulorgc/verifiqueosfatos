@@ -149,6 +149,7 @@
     let nodes = new Map();
     let lastRaw = null;
     let unseen = 0;
+    const seen = new Set();
     let currentPosts = [];
 
     function createFixHTML(fix) {
@@ -241,7 +242,6 @@
       const first = nodes.size === 0;
       const next = new Map();
       const list = [];
-      let added = 0;
 
       for (let i = items.length - 1; i >= 0; i--) {
         const item = items[i];
@@ -254,10 +254,7 @@
         let el = nodes.get(key);
         if (!el) {
           el = createCard(item);
-          if (!first) {
-            el.classList.add('new');
-            added++;
-          }
+          if (!first) el.classList.add('new');
         }
         // Stable id for share links; the index shifts when a post is removed, so it's only a fallback
         el.id = item.id != null ? `c${item.id}` : `f${i}`;
@@ -289,11 +286,11 @@
         setTimeout(() => shared.scrollIntoView({ block: 'center' }), 400);
       }
 
-      if (added && window.scrollY > main.offsetTop) {
-        unseen += added;
-        more.textContent = `↑ ${unseen} ${unseen > 1 ? 'novas verificações' : 'nova verificação'}`;
-        more.hidden = false;
-      }
+      const ids = list.map(el => el.id);
+      if (first || window.scrollY <= main.offsetTop) ids.forEach(id => seen.add(id));
+      unseen = ids.filter(id => !seen.has(id)).length;
+      more.textContent = `↑ ${unseen} ${unseen > 1 ? 'novas verificações' : 'nova verificação'}`;
+      more.hidden = !unseen;
       return true;
     }
 
@@ -343,9 +340,10 @@
       } catch {}
     };
 
-    more.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    more.addEventListener('click', () => window.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }));
     window.addEventListener('scroll', () => {
       if (unseen && window.scrollY <= main.offsetTop) {
+        nodes.forEach(el => seen.add(el.id));
         unseen = 0;
         more.hidden = true;
       }
